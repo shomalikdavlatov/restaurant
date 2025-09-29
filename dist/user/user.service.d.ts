@@ -6,36 +6,8 @@ export declare class UserService {
         email: string;
         username: string;
         password: string;
-    }): Promise<{
-        email: string;
-        username: string;
-        password: string;
-        createdAt: Date;
-        updatedAt: Date;
-        id: number;
-    }>;
-    findById(id: number): Promise<{
-        email: string;
-        username: string;
-        password: string;
-        createdAt: Date;
-        updatedAt: Date;
-        id: number;
-    } | null>;
-    findByEmailOrUsername(email: string, username: string): Promise<{
-        email: string;
-        username: string;
-        password: string;
-        createdAt: Date;
-        updatedAt: Date;
-        id: number;
-    } | null>;
-    updatePassword(email: string, password: string): Promise<{
-        email: string;
-        username: string;
-        password: string;
-        createdAt: Date;
-        updatedAt: Date;
-        id: number;
-    }>;
+    }): Promise<any>;
+    findById(id: number): Promise<any>;
+    findByEmailOrUsername(email: string, username: string): Promise<any>;
+    updatePassword(email: string, password: string): Promise<any>;
 }

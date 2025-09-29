@@ -10,6 +10,7 @@ import { UseGuards } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { TrafficService } from "./traffic.service";
 import { TrafficDataDto } from "./dto/traffic-data.dto";
+import { WsJwtGuard } from "src/common/guards/ws.guard";
 
 @WebSocketGateway({
     cors: {
@@ -23,13 +24,13 @@ export class TrafficGateway {
     constructor(private trafficService: TrafficService) {}
 
     @SubscribeMessage("traffic-data")
-    @UseGuards(AuthGuard("jwt"))
+    @UseGuards(WsJwtGuard)
     async handleTrafficData(
         @MessageBody() data: TrafficDataDto,
         @ConnectedSocket() client: Socket
     ) {
         try {
-            const user = (client.request as any).user;
+            const user = client['user'];
 
             if (!user) {
                 client.emit("error", { message: "Unauthorized" });
@@ -37,7 +38,7 @@ export class TrafficGateway {
             }
 
             const result = await this.trafficService.updateTrafficData(
-                user.id,
+                user.sub,
                 data.device_id,
                 data.in_count,
                 data.out_count

@@ -28,6 +28,7 @@ let TrafficGateway = class TrafficGateway {
     async handleTrafficData(data, client) {
         try {
             const user = client.request.user;
+            console.log(client.request['user']);
             if (!user) {
                 client.emit("error", { message: "Unauthorized" });
                 return;

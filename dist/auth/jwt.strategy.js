@@ -20,9 +20,20 @@ let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(pas
     userService;
     constructor(configService, userService) {
         super({
-            jwtFromRequest: passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken(),
+            jwtFromRequest: passport_jwt_1.ExtractJwt.fromExtractors([
+                (req) => {
+                    console.log("Handshake auth:", req?.handshake?.auth);
+                    if (req?.headers?.authorization) {
+                        return req.headers.authorization.split(" ")[1];
+                    }
+                    if (req?.handshake?.auth?.token) {
+                        return req.handshake.auth.token;
+                    }
+                    return null;
+                },
+            ]),
             ignoreExpiration: false,
-            secretOrKey: configService.get("JWT_SECRET")
+            secretOrKey: configService.get("JWT_SECRET"),
         });
         this.configService = configService;
         this.userService = userService;
@@ -32,7 +43,7 @@ let JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(pas
         if (!user) {
             throw new common_1.UnauthorizedException();
         }
-        return user;
+        return { id: payload.sub, email: payload.email };
     }
 };
 exports.JwtStrategy = JwtStrategy;

@@ -11,9 +11,20 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         private userService: UserService
     ) {
         super({
-            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+            jwtFromRequest: ExtractJwt.fromExtractors([
+                (req) => {
+                    console.log("Handshake auth:", req?.handshake?.auth); // 👈 log this
+                    if (req?.headers?.authorization) {
+                        return req.headers.authorization.split(" ")[1];
+                    }
+                    if (req?.handshake?.auth?.token) {
+                        return req.handshake.auth.token;
+                    }
+                    return null;
+                },
+            ]),
             ignoreExpiration: false,
-            secretOrKey: configService.get("JWT_SECRET")!
+            secretOrKey: configService.get("JWT_SECRET")!,
         });
     }
 
@@ -22,6 +33,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         if (!user) {
             throw new UnauthorizedException();
         }
-        return user;
+return { id: payload.sub, email: payload.email };
     }
 }

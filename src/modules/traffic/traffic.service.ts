@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { PrismaService } from "../database/prisma.service";
+import { PrismaService } from "src/core/database/prisma.service";
 
 @Injectable()
 export class TrafficService {
@@ -16,6 +16,7 @@ export class TrafficService {
 
         const existingRecord = await this.prisma.traffic.findUnique({
             where: {
+                userId,
                 userId_date_deviceId: {
                     userId,
                     date: today,
@@ -28,11 +29,11 @@ export class TrafficService {
             const updateData: any = {};
 
             if (inCount > 0) {
-                updateData.inCount = existingRecord.inCount + inCount;
+                updateData.inCount = inCount;
             }
 
             if (outCount > 0) {
-                updateData.outCount = existingRecord.outCount + outCount;
+                updateData.outCount = outCount;
             }
 
             if (Object.keys(updateData).length > 0) {

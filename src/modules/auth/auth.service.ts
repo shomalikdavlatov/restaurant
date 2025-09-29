@@ -6,12 +6,12 @@ import {
 import { JwtService } from "@nestjs/jwt";
 import * as bcrypt from "bcryptjs";
 import { UserService } from "../user/user.service";
-import { EmailService } from "../email/email.service";
-import { RedisService } from "../database/redis.service";
 import { RegisterDto } from "./dto/register.dto";
 import { LoginDto } from "./dto/login.dto";
 import { VerifyOtpDto } from "./dto/verify-otp.dto";
 import { ResetPasswordDto } from "./dto/reset-password.dto";
+import { EmailService } from "src/core/email/email.service";
+import { RedisService } from "src/core/database/redis.service";
 
 @Injectable()
 export class AuthService {
