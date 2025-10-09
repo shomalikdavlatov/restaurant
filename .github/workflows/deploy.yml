@@ -10,7 +10,7 @@ jobs:
 
     steps:
       - name: Debug secret
-        run: echo "${{ secrets }}"
+        run: echo "${{ secrets.PORT }}"
 
       - name: Kodlarni olish
         uses: actions/checkout@v4
