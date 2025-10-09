@@ -15,20 +15,30 @@ jobs:
         uses: actions/checkout@v4
 
       - name: .env fayl yaratish
+        env:
+          PORT: ${{ secrets.PORT }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          REDIS_URL: ${{ secrets.REDIS_URL }}
+          JWT_EXPIRE: ${{ secrets.JWT_EXPIRE }}
+          GMAIL_EMAIL: ${{ secrets.GMAIL_EMAIL }}
+          GMAIL_PASSWORD: ${{ secrets.GMAIL_PASSWORD }}
+          JWT_KEY: ${{ secrets.JWT_KEY }}
+          SP_EMAIL: ${{ secrets.SP_EMAIL }}
+          SP_USERNAME: ${{ secrets.SP_USERNAME }}
+          SP_PASSWORD: ${{ secrets.SP_PASSWORD }}
         run: |
-          cat > .env << EOF
-          PORT=${{ secrets.PORT }}
-          DATABASE_URL=${{ secrets.DATABASE_URL }}
-          JWT_SECRET=${{ secrets.JWT_SECRET }}
-          REDIS_URL=${{ secrets.REDIS_URL }}
-          JWT_EXPIRE=${{ secrets.JWT_EXPIRE }}
-          GMAIL_EMAIL=${{ secrets.GMAIL_EMAIL }}
-          GMAIL_PASSWORD=${{ secrets.GMAIL_PASSWORD }}
-          JWT_KEY=${{ secrets.JWT_KEY }}
-          SP_EMAIL=${{ secrets.SP_EMAIL }}
-          SP_USERNAME=${{ secrets.SP_USERNAME }}
-          SP_PASSWORD=${{ secrets.SP_PASSWORD }}
-          EOF
+          echo "PORT=$PORT" > .env
+          echo "DATABASE_URL=$DATABASE_URL" >> .env
+          echo "JWT_SECRET=$JWT_SECRET" >> .env
+          echo "REDIS_URL=$REDIS_URL" >> .env
+          echo "JWT_EXPIRE=$JWT_EXPIRE" >> .env
+          echo "GMAIL_EMAIL=$GMAIL_EMAIL" >> .env
+          echo "GMAIL_PASSWORD=$GMAIL_PASSWORD" >> .env
+          echo "JWT_KEY=$JWT_KEY" >> .env
+          echo "SP_EMAIL=$SP_EMAIL" >> .env
+          echo "SP_USERNAME=$SP_USERNAME" >> .env
+          echo "SP_PASSWORD=$SP_PASSWORD" >> .env
 
       - name: Fayllarni serverga yuborish
         uses: appleboy/scp-action@v0.1.7
