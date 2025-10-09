@@ -9,50 +9,33 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
+    env:
+      PORT: ${{ secrets.PORT }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      REDIS_URL: ${{ secrets.REDIS_URL }}
+      JWT_EXPIRE: ${{ secrets.JWT_EXPIRE }}
+      GMAIL_EMAIL: ${{ secrets.GMAIL_EMAIL }}
+      GMAIL_PASSWORD: ${{ secrets.GMAIL_PASSWORD }}
+      JWT_KEY: ${{ secrets.JWT_KEY }}
+      SP_EMAIL: ${{ secrets.SP_EMAIL }}
+      SP_USERNAME: ${{ secrets.SP_USERNAME }}
+      SP_PASSWORD: ${{ secrets.SP_PASSWORD }}
     steps:
       - name: Kodlarni olish
         uses: actions/checkout@v4
 
       - name: Secretlarni tekshirish
         run: |
-          echo "PORT bo'sh: ${{secrets.PORT == ''}}"
-          echo "DATABASE_URL uzunligi: ${#DATABASE_URL}"
-          if [ -z "${{secrets.PORT}}" ]; then
+          if [ -z "$PORT" ]; then
             echo "❌ PORT secret topilmadi!"
           else
             echo "✅ PORT secret mavjud"
           fi
-      - name: .env fayl yaratish
-        env:
-          PORT: ${{secrets.PORT}}
-          DATABASE_URL: ${{secrets.DATABASE_URL}}
-          JWT_SECRET: ${{secrets.JWT_SECRET}}
-          REDIS_URL: ${{secrets.REDIS_URL}}
-          JWT_EXPIRE: ${{secrets.JWT_EXPIRE}}
-          GMAIL_EMAIL: ${{secrets.GMAIL_EMAIL}}
-          GMAIL_PASSWORD: ${{secrets.GMAIL_PASSWORD}}
-          JWT_KEY: ${{secrets.JWT_KEY}}
-          SP_EMAIL: ${{secrets.SP_EMAIL}}
-          SP_USERNAME: ${{secrets.SP_USERNAME}}
-          SP_PASSWORD: ${{secrets.SP_PASSWORD}}
-        run: |
-          echo "PORT=$PORT" > .env
-          echo "DATABASE_URL=$DATABASE_URL" >> .env
-          echo "JWT_SECRET=$JWT_SECRET" >> .env
-          echo "REDIS_URL=$REDIS_URL" >> .env
-          echo "JWT_EXPIRE=$JWT_EXPIRE" >> .env
-          echo "GMAIL_EMAIL=$GMAIL_EMAIL" >> .env
-          echo "GMAIL_PASSWORD=$GMAIL_PASSWORD" >> .env
-          echo "JWT_KEY=$JWT_KEY" >> .env
-          echo "SP_EMAIL=$SP_EMAIL" >> .env
-          echo "SP_USERNAME=$SP_USERNAME" >> .env
-          echo "SP_PASSWORD=$SP_PASSWORD" >> .env
-
       - name: Fayllarni serverga yuborish
         uses: appleboy/scp-action@v0.1.7
         with:
-          host: ${{ secrets.SERVER_HOST }}
+          host: "$SERVER_HOST"
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: ".env"
@@ -62,11 +45,11 @@ jobs:
       - name: Docker bilan deploy qilish
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{secrets.SERVER_HOST}}
-          username: ${{secrets.SERVER_USERNAME}}
-          key: ${{secrets.SSH_PRIVATE_KEY}}
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd ${{secrets.PROJECT_PATH}}
+            cd ${{ secrets.PROJECT_PATH }}
             git pull origin main
             sudo docker compose down
             sudo docker compose pull
