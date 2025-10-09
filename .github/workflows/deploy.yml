@@ -9,14 +9,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Test secret exists
-        run: |
-          if [ -z "${{ secrets.MY_SECRET }}" ]; then
-            echo "❌ Secret not found"
-          else
-            echo "✅ Secret is set (value hidden)"
-          fi
-          
+      - name: Debug secret
+        run: echo "${{ secrets }}"
+
       - name: Kodlarni olish
         uses: actions/checkout@v4
 
