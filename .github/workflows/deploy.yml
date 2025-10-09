@@ -9,9 +9,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Debug secret
-        run: echo "${{ secrets.PORT }}"
-
       - name: Kodlarni olish
         uses: actions/checkout@v4
 
@@ -28,17 +25,6 @@ jobs:
           echo "SP_EMAIL=${{ secrets.SP_EMAIL }}" >> .env
           echo "SP_USERNAME=${{ secrets.SP_USERNAME }}" >> .env
           echo "SP_PASSWORD=${{ secrets.SP_PASSWORD }}" >> .env
-
-      - name: .env tekshirish
-        run: |
-          if [ -f .env ]; then
-            echo "✅ .env fayl yaratildi"
-            echo "Fayl hajmi: $(wc -l < .env) qator"
-            cat .env
-          else
-            echo "❌ .env fayl yaratilmadi!"
-            exit 1
-          fi
 
       - name: .env faylni serverga yuborish
         uses: appleboy/scp-action@v0.1.7
@@ -62,7 +48,5 @@ jobs:
             cd ${{ secrets.PROJECT_PATH }}
             git pull origin main
             sudo docker compose down
-            sudo docker compose pull
             sudo docker compose up -d --build
-            sudo docker image prune -f
             echo "✅ Deploy muvaffaqiyatli tugadi!"
