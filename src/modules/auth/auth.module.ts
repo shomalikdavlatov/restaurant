@@ -9,19 +9,8 @@ import { UserModule } from "../user/user.module";
 import { EmailModule } from "src/core/email/email.module";
 
 @Module({
-    imports: [
-        PassportModule,
-        JwtModule.registerAsync({
-            useFactory: (configService: ConfigService) => ({
-                secret: configService.get("JWT_SECRET"),
-                signOptions: { expiresIn: configService.get("JWT_EXPIRE") },
-            }),
-            inject: [ConfigService],
-        }),
-        UserModule,
-        EmailModule,
-    ],
-    controllers: [AuthController],
-    providers: [AuthService, JwtStrategy],
+  imports: [PassportModule, UserModule, EmailModule],
+  controllers: [AuthController],
+  providers: [AuthService],
 })
 export class AuthModule {}

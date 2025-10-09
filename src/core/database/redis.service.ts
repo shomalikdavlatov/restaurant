@@ -4,39 +4,40 @@ import Redis from "ioredis";
 
 @Injectable()
 export class RedisService implements OnModuleInit, OnModuleDestroy {
-    private client: Redis;
+  private client: Redis;
 
-    constructor(private configService: ConfigService) {}
+  constructor(private configService: ConfigService) {}
 
-    async onModuleInit() {
-        this.client = new Redis(this.configService.get("REDIS_URL")!);
+  async onModuleInit() {
+    this.client = new Redis(this.configService.get("REDIS_URL")!);
+    console.log("Redis connected");
+  }
+
+  async onModuleDestroy() {
+    await this.client.quit();
+  }
+
+  async set(key: string, value: string, ttl?: number): Promise<void> {
+    if (ttl) {
+      await this.client.setex(key, ttl, value);
+    } else {
+      await this.client.set(key, value);
     }
+  }
 
-    async onModuleDestroy() {
-        await this.client.quit();
-    }
+  async get(key: string): Promise<string | null> {
+    return await this.client.get(key);
+  }
 
-    async set(key: string, value: string, ttl?: number): Promise<void> {
-        if (ttl) {
-            await this.client.setex(key, ttl, value);
-        } else {
-            await this.client.set(key, value);
-        }
-    }
+  async del(key: string): Promise<void> {
+    await this.client.del(key);
+  }
 
-    async get(key: string): Promise<string | null> {
-        return await this.client.get(key);
-    }
+  async incr(key: string): Promise<number> {
+    return await this.client.incr(key);
+  }
 
-    async del(key: string): Promise<void> {
-        await this.client.del(key);
-    }
-
-    async incr(key: string): Promise<number> {
-        return await this.client.incr(key);
-    }
-
-    async expire(key: string, seconds: number): Promise<void> {
-        await this.client.expire(key, seconds);
-    }
+  async expire(key: string, seconds: number): Promise<void> {
+    await this.client.expire(key, seconds);
+  }
 }
