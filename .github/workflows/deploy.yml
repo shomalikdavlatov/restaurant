@@ -1,0 +1,55 @@
+name: Node.js Docker Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Kodlarni olish
+        uses: actions/checkout@v4
+
+      - name: .env fayl yaratish
+        run: |
+          cat > .env << EOF
+          PORT=${{ secrets.PORT }}
+          DATABASE_URL=${{ secrets.DATABASE_URL }}
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          REDIS_URL=${{ secrets.REDIS_URL }}
+          JWT_EXPIRE=${{ secrets.JWT_EXPIRE }}
+          GMAIL_EMAIL=${{ secrets.GMAIL_EMAIL }}
+          GMAIL_PASSWORD=${{ secrets.GMAIL_PASSWORD }}
+          JWT_KEY=${{ secrets.JWT_KEY }}
+          SP_EMAIL=${{ secrets.SP_EMAIL }}
+          SP_USERNAME=${{ secrets.SP_USERNAME }}
+          SP_PASSWORD=${{ secrets.SP_PASSWORD }}
+          EOF
+
+      - name: Fayllarni serverga yuborish
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: ".env"
+          target: ${{ secrets.PROJECT_PATH }}
+          overwrite: true
+
+      - name: Docker bilan deploy qilish
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd ${{ secrets.PROJECT_PATH }}
+            git pull origin main
+            sudo docker compose down
+            sudo docker compose pull
+            sudo docker compose up -d --build
+            sudo docker image prune -f
