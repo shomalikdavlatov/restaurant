@@ -31,6 +31,7 @@ jobs:
           if [ -f .env ]; then
             echo "✅ .env fayl yaratildi"
             echo "Fayl hajmi: $(wc -l < .env) qator"
+            cat .env
           else
             echo "❌ .env fayl yaratilmadi!"
             exit 1
