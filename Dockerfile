@@ -1,6 +1,27 @@
-FROM  node:22-alpine
+FROM node:22-alpine AS builder
+RUN corepack enable
+RUN corepack prepare yarn@4.0.2 --activate
 WORKDIR /app
+
 COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile && yarn cache clean
+RUN yarn install --frozen-lockfile
+
+COPY prisma ./prisma/
+RUN npx prisma generate
+
 COPY . .
-EXPOSE 3000
+RUN yarn build
+
+FROM node:22-alpine
+RUN corepack enable
+RUN corepack prepare yarn@4.0.2 --activate
+WORKDIR /app
+
+COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile --production
+
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY prisma ./prisma/
+
+CMD ["sh", "-c", "npx prisma db push && yarn start:prod"]
