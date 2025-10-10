@@ -1,6 +1,5 @@
 FROM node:22-alpine AS builder
 RUN corepack enable
-RUN corepack prepare yarn@4.0.2 --activate
 WORKDIR /app
 
 COPY package.json yarn.lock ./
@@ -14,7 +13,6 @@ RUN yarn build
 
 FROM node:22-alpine
 RUN corepack enable
-RUN corepack prepare yarn@4.0.2 --activate
 WORKDIR /app
 
 COPY package.json yarn.lock ./
@@ -25,3 +23,4 @@ COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY prisma ./prisma/
 
 CMD ["sh", "-c", "npx prisma db push && yarn start:prod"]
+
