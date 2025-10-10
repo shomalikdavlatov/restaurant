@@ -6,7 +6,7 @@ services:
       - "4000:3000"
     env_file:
       - .env
-    command: sh -c 'npx prisma db push && yarn start:prod'
+    command: sh -c 'npx prisma db push && yarn build && yarn start:prod'
     depends_on:
       postgres:
         condition: service_healthy
