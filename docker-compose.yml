@@ -6,7 +6,6 @@ services:
       - "4000:3000"
     env_file:
       - .env
-    command: sh -c 'npx prisma db push && yarn build && yarn start:prod'
     depends_on:
       postgres:
         condition: service_healthy
@@ -25,3 +24,4 @@ services:
     image: redis:7
     ports:
       - "6380:6379"
+
