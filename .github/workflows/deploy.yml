@@ -25,6 +25,8 @@ jobs:
           echo "SP_EMAIL=${{ secrets.SP_EMAIL }}" >> .env
           echo "SP_USERNAME=${{ secrets.SP_USERNAME }}" >> .env
           echo "SP_PASSWORD=${{ secrets.SP_PASSWORD }}" >> .env
+          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
+          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
 
       - name: .env faylni serverga yuborish
         uses: appleboy/scp-action@v0.1.7
