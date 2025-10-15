@@ -1,8 +1,9 @@
 FROM node:22-alpine AS builder
+RUN corepack enable
 WORKDIR /app
 
 COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile
+RUN yarn install --frozen-lockfile && yarn cache clean
 
 COPY prisma ./prisma/
 RUN npx prisma generate
@@ -11,6 +12,7 @@ COPY . .
 RUN yarn build
 
 FROM node:22-alpine
+RUN corepack enable
 WORKDIR /app
 
 COPY package.json yarn.lock ./

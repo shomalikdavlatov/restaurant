@@ -24,4 +24,3 @@ services:
     image: redis:7
     ports:
       - "6380:6379"
-
