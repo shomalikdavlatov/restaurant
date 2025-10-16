@@ -9,7 +9,7 @@ COPY prisma ./prisma/
 RUN npx prisma generate
 
 COPY . .
-RUN npm build
+RUN npm run build
 
 FROM node:22-alpine
 RUN corepack enable
