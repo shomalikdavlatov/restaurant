@@ -1,0 +1,54 @@
+name: Node.js Docker Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Kodlarni olish
+        uses: actions/checkout@v4
+
+      - name: .env fayl yaratish
+        run: |
+          echo "PORT=${{ secrets.PORT }}" > .env
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
+          echo "REDIS_URL=${{ secrets.REDIS_URL }}" >> .env
+          echo "JWT_EXPIRE=${{ secrets.JWT_EXPIRE }}" >> .env
+          echo "GMAIL_EMAIL=${{ secrets.GMAIL_EMAIL }}" >> .env
+          echo "GMAIL_PASSWORD=${{ secrets.GMAIL_PASSWORD }}" >> .env
+          echo "JWT_KEY=${{ secrets.JWT_KEY }}" >> .env
+          echo "SP_EMAIL=${{ secrets.SP_EMAIL }}" >> .env
+          echo "SP_USERNAME=${{ secrets.SP_USERNAME }}" >> .env
+          echo "SP_PASSWORD=${{ secrets.SP_PASSWORD }}" >> .env
+          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
+          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
+
+      - name: .env faylni serverga yuborish
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: 22
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: ".env"
+          target: ${{ secrets.PROJECT_PATH }}
+          overwrite: true
+
+      - name: Docker bilan deploy qilish
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: 22
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd ${{ secrets.PROJECT_PATH }}
+            git pull origin main
+            sudo docker compose down
+            sudo docker compose up -d --build
+            echo "✅ Deploy muvaffaqiyatli tugadi!"
