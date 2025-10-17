@@ -13,7 +13,7 @@ COPY . .
 RUN yarn build
 
 FROM node:trixie-slim
-RUN corepack enable
+# RUN corepack enable
 WORKDIR /app
 
 COPY package.json yarn.lock ./
