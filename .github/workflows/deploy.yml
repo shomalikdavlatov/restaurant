@@ -49,8 +49,9 @@ jobs:
           script: |
             cd ${{ secrets.PROJECT_PATH }}
             git pull origin main
-            sudo npx yarn install
-            sudo npx yarn run build
+            yarn install
+            yarn run build
             pm2 start dist/main.js
 
             
+
