@@ -1,6 +1,6 @@
 FROM node:trixie-slim AS builder
 # RUN corepack enable
-RUN npm install -g @nestjs/cli
+# RUN npm install -g @nestjs/cli
 WORKDIR /app
 
 COPY package.json yarn.lock ./
