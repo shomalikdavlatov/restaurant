@@ -17,7 +17,10 @@ async function bootstrap() {
     })
   );
 
-  app.enableCors();
+  app.enableCors({
+    origin: true,
+    credentials: true,
+  });
 
   const config = new DocumentBuilder()
     .setTitle("REstourant API hizmatlari") // sarlavha
