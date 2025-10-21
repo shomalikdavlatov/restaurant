@@ -50,6 +50,7 @@ export class UserService {
           userId,
         },
       });
+
       return { message: "success" };
     }
 
@@ -59,14 +60,15 @@ export class UserService {
 
     if (!findDevice) throw new NotFoundException("Device not found");
 
+    const existingTraffic = await this.prisma.traffic.findFirst({
+      where: { userId, deviceId: data.device_id },
+      orderBy: { dateTime: "desc" },
+    });
+
+    if (!existingTraffic) throw new NotFoundException("Traffic not found");
+
     await this.prisma.traffic.update({
-      where: {
-        userId_dateTime_deviceId: {
-          userId,
-          dateTime: new Date(),
-          deviceId: data.device_id,
-        },
-      },
+      where: { id: existingTraffic.id },
       data: {
         inCount: data.in_count,
         outCount: data.out_count,
