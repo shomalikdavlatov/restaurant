@@ -12,12 +12,15 @@ import { CheckUserDto } from "./dto/check.user.dto";
 import { Request } from "express";
 import { AuthGuard } from "src/common/guards/auth.guard";
 import { UpdateUserDto } from "./dto/update.user.dto";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 
 @Controller("user")
+@ApiTags("User")
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post("create-update")
+  @ApiBearerAuth()
   @UseGuards(AuthGuard)
   async checkUser(@Body() body: CheckUserDto, @Req() req: Request) {
     const userId = req["userId"];
@@ -25,6 +28,7 @@ export class UserController {
   }
 
   @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   @Put("update")
   async updateUser(@Body() body: UpdateUserDto, @Req() req: Request) {
     const userId = req["userId"];

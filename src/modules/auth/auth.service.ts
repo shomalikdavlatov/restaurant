@@ -35,6 +35,8 @@ export class AuthService {
     const otpKey = `otp_register_${registerDto.email}`;
     const attemptsKey = `attempts_register_${registerDto.email}`;
 
+    console.log("register ishladi");
+
     await this.redisService.set(otpKey, otp, 300);
     await this.redisService.set(attemptsKey, "0", 300);
     await this.redisService.set(

@@ -1,18 +1,20 @@
-import { Controller, Post, Body, HttpCode, Res } from "@nestjs/common";
-import { AuthService } from "./auth.service";
-import { RegisterDto } from "./dto/register.dto";
-import { LoginDto } from "./dto/login.dto";
-import { VerifyOtpDto } from "./dto/verify-otp.dto";
-import { ResetPasswordDto } from "./dto/reset-password.dto";
+import { Body, Controller, HttpCode, Post, Res } from "@nestjs/common";
+import { ApiTags } from "@nestjs/swagger";
 import { Response } from "express";
+import { AuthService } from "./auth.service";
+import { LoginDto } from "./dto/login.dto";
+import { RegisterDto } from "./dto/register.dto";
+import { ResetPasswordDto } from "./dto/reset-password.dto";
+import { VerifyOtpDto } from "./dto/verify-otp.dto";
 
 @Controller("auth")
+@ApiTags("Auth")
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post("register")
-  register(@Body() registerDto: RegisterDto) {
-    return this.authService.register(registerDto);
+  async register(@Body() registerDto: RegisterDto) {
+    return await this.authService.register(registerDto);
   }
 
   @Post("verify-registration")
