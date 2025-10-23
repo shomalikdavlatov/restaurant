@@ -11,6 +11,7 @@ import { CreateTrafficDto } from "./dto/traffic.dto";
 import { AuthGuard } from "src/common/guards/auth.guard";
 import { Request } from "express";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+import { CreateDeviceDto } from "./dto/create.device.dto";
 
 @Controller("traffic")
 @ApiTags("Traffic")
@@ -31,5 +32,12 @@ export class TrafficController {
     }
 
     return this.trafficService.createOrUpdateTraffic(userId, createTrafficDto);
+  }
+
+  @Post("create-device")
+  @ApiBearerAuth()
+  async createDevice(@Body() body: CreateDeviceDto, @Req() request: Request) {
+    const userId = request["userId"];
+    return await this.trafficService.createDevice(userId, body);
   }
 }

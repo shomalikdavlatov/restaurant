@@ -2,10 +2,8 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
-  UnauthorizedException,
 } from "@nestjs/common";
 import { PrismaService } from "src/core/database/prisma.service";
-import { CheckUserDto } from "./dto/check.user.dto";
 import { UpdateUserDto } from "./dto/update.user.dto";
 
 @Injectable()
@@ -33,49 +31,6 @@ export class UserService {
       where: { email },
       data: { password },
     });
-  }
-
-  async checkUser(data: CheckUserDto, userId: number) {
-    const findUser = await this.prisma.user.findFirst({
-      where: { id: userId },
-    });
-
-    if (!findUser)
-      throw new UnauthorizedException("Siz ro'yxatdan o'tishingiz kerak");
-
-    if (data.in_count === 0 && data.out_count === 0) {
-      await this.prisma.traffic.create({
-        data: {
-          deviceId: data.device_id,
-          userId,
-        },
-      });
-
-      return { message: "success" };
-    }
-
-    const findDevice = await this.prisma.traffic.findFirst({
-      where: { deviceId: data.device_id },
-    });
-
-    if (!findDevice) throw new NotFoundException("Device not found");
-
-    const existingTraffic = await this.prisma.traffic.findFirst({
-      where: { userId, deviceId: data.device_id },
-      orderBy: { dateTime: "desc" },
-    });
-
-    if (!existingTraffic) throw new NotFoundException("Traffic not found");
-
-    await this.prisma.traffic.update({
-      where: { id: existingTraffic.id },
-      data: {
-        inCount: data.in_count,
-        outCount: data.out_count,
-      },
-    });
-
-    return { message: "success" };
   }
 
   async updateUser(data: UpdateUserDto, userId: number) {
