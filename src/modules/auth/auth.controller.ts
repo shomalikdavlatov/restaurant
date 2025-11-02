@@ -27,7 +27,7 @@ export class AuthController {
       httpOnly: true,
       path: "/",
       secure: false,
-      sameSite: "none",
+      sameSite: "lax",
       maxAge: 4.05 * 3600 * 1000,
     });
     return data;
@@ -45,7 +45,7 @@ export class AuthController {
       httpOnly: true,
       path: "/",
       secure: false,
-      sameSite: "none",
+      sameSite: "lax",
       maxAge: 4.05 * 3600 * 1000,
     });
     return data;
