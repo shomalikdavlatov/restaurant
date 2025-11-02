@@ -25,8 +25,9 @@ export class AuthController {
     const data = await this.authService.verifyRegistrationOTP(verifyOtpDto);
     res.cookie("token", data.token, {
       httpOnly: true,
+      path: "/",
       secure: false,
-      sameSite: "lax",
+      sameSite: "none",
       maxAge: 4.05 * 3600 * 1000,
     });
     return data;
@@ -42,8 +43,9 @@ export class AuthController {
 
     res.cookie("token", data.token, {
       httpOnly: true,
+      path: "/",
       secure: false,
-      sameSite: "lax",
+      sameSite: "none",
       maxAge: 4.05 * 3600 * 1000,
     });
     return data;
