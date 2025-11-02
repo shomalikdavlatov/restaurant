@@ -18,15 +18,21 @@ async function bootstrap() {
   );
 
   app.enableCors({
-    origin: true,
-    credentials: true,
+    origin: true, // Barcha origin'lar uchun ochiq (development uchun ideal)
+    credentials: true, // Cookie'lar uchun majburiy
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS", // OPTIONS qo'shdim, preflight so'rovlar uchun
+    allowedHeaders: "Content-Type, Authorization, Cookie", // Cookie header'ini qo'shdim, agar kerak bo'lsa
   });
 
   const config = new DocumentBuilder()
-    .setTitle("REstourant API hizmatlari") // sarlavha
-    .setDescription("restoram analizi uchun api lar jamlanmasi") // tavsif
-    .setVersion("1.0") // versiya
-    .addBearerAuth() // JWT uchun authentication qo‘shish
+    .setTitle("REstourant API hizmatlari")
+    .setDescription("restoram analizi uchun api lar jamlanmasi")
+    .setVersion("1.0")
+    .addCookieAuth("token", {
+      type: "apiKey",
+      in: "cookie",
+      name: "token",
+    })
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
