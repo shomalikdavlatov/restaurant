@@ -11,7 +11,7 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @UseGuards(AuthGuard)
-  @ApiBearerAuth()
+  @ApiBearerAuth("token")
   @Put("update")
   async updateUser(@Body() body: UpdateUserDto, @Req() req: Request) {
     const userId = req["userId"];

@@ -18,25 +18,29 @@ async function bootstrap() {
   );
 
   app.enableCors({
-    origin: true, // Barcha origin'lar uchun ochiq (development uchun ideal)
-    credentials: true, // Cookie'lar uchun majburiy
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS", // OPTIONS qo'shdim, preflight so'rovlar uchun
-    allowedHeaders: "Content-Type, Authorization, Cookie", // Cookie header'ini qo'shdim, agar kerak bo'lsa
+    origin: true,
+    credentials: true,
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
+    allowedHeaders: "Content-Type, Authorization, Cookie",
   });
 
   const config = new DocumentBuilder()
-    .setTitle("REstourant API hizmatlari")
-    .setDescription("restoram analizi uchun api lar jamlanmasi")
+    .setTitle("Restourant API xizmatlari")
+    .setDescription("Restoran analizi uchun API lar jamlanmasi")
     .setVersion("1.0")
-    .addCookieAuth("token", {
-      type: "apiKey",
-      in: "cookie",
-      name: "token",
-    })
+    .addBearerAuth(
+      {
+        type: "http",
+        scheme: "bearer",
+        bearerFormat: "JWT",
+        description: "JWT token kiriting (Bearer so'zsiz)",
+      },
+      "token"
+    )
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup("api/docs", app, document); // URL: /api/docs
+  SwaggerModule.setup("api/docs", app, document);
 
   const port = process.env.PORT || 3000;
   await app.listen(port);

@@ -10,7 +10,7 @@ export class AnalyticsController {
   constructor(private readonly analyticsService: AnalyticsService) {}
 
   @UseGuards(AuthGuard)
-  @ApiBearerAuth()
+  @ApiBearerAuth("token")
   @Get("visitors")
   @ApiQuery({
     name: "from",
@@ -34,14 +34,14 @@ export class AnalyticsController {
   }
 
   @UseGuards(AuthGuard)
-  @ApiBearerAuth()
+  @ApiBearerAuth("token")
   @Get("today-branches")
   async getTodayBranches() {
     return await this.analyticsService.getTodayBranches();
   }
 
   @UseGuards(AuthGuard)
-  @ApiBearerAuth()
+  @ApiBearerAuth("token")
   @Get("day-statistics")
   @ApiQuery({
     name: "day",
@@ -54,7 +54,7 @@ export class AnalyticsController {
   }
 
   @UseGuards(AuthGuard)
-  @ApiBearerAuth()
+  @ApiBearerAuth("token")
   @Get("branches")
   async getAllBranches() {
     return await this.analyticsService.getAllBranches();

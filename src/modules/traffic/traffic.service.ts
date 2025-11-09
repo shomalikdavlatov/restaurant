@@ -8,6 +8,8 @@ import {
 import { PrismaService } from "src/core/database/prisma.service";
 import { CreateTrafficDto } from "./dto/traffic.dto";
 import { CreateDeviceDto } from "./dto/create.device.dto";
+import { UpdateDeviceDto } from "./dto/update.device.dto";
+import { DeleteDeviceDto } from "./dto/delete.device.dto";
 
 @Injectable()
 export class TrafficService {
@@ -98,5 +100,123 @@ export class TrafficService {
     const newDevice = await this.prisma.device.create({ data });
 
     return { message: "success", newDevice };
+  }
+
+  async updateDevice(userId: number, data: UpdateDeviceDto) {
+    const { deviceId } = data;
+
+    const admin = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!admin) throw new NotFoundException("Admin topilmadi");
+    if (admin.role !== "ADMIN")
+      throw new ForbiddenException("Faqat admin device yangilashi mumkin");
+
+    const existingDevice = await this.prisma.device.findUnique({
+      where: {
+        userId_deviceId: {
+          userId: data.userId,
+          deviceId,
+        },
+      },
+    });
+
+    if (!existingDevice)
+      throw new NotFoundException("Yangilanish uchun device topilmadi");
+
+    if (data.userId && data.userId !== existingDevice.userId) {
+      const conflict = await this.prisma.device.findUnique({
+        where: {
+          userId_deviceId: {
+            userId: data.userId,
+            deviceId,
+          },
+        },
+      });
+      if (conflict)
+        throw new ConflictException(
+          "Bu device allaqachon boshqa filialga biriktirilgan"
+        );
+    }
+
+    const updatedDevice = await this.prisma.device.update({
+      where: { id: existingDevice.id },
+      data: {
+        ...(data.userId && { userId: data.userId }), // agar userId kelgan bo‘lsa yangilanadi
+      },
+    });
+
+    return {
+      message: "Device muvaffaqiyatli yangilandi",
+      updatedDevice,
+    };
+  }
+
+  async deleteDevice(adminId: number, data: DeleteDeviceDto) {
+    const { deviceId, userId } = data;
+
+    const admin = await this.prisma.user.findUnique({ where: { id: adminId } });
+    if (!admin) throw new NotFoundException("Admin topilmadi");
+    if (admin.role !== "ADMIN")
+      throw new ForbiddenException("Faqat admin device o'chirishi mumkin");
+
+    const existingDevice = await this.prisma.device.findUnique({
+      where: {
+        userId_deviceId: {
+          userId,
+          deviceId,
+        },
+      },
+    });
+
+    if (!existingDevice)
+      throw new NotFoundException("Filialda bunday device topilmadi");
+
+    await this.prisma.device.delete({
+      where: { id: existingDevice.id },
+    });
+
+    return {
+      message: "Device muvaffaqiyatli o‘chirildi",
+      deletedDeviceId: deviceId,
+    };
+  }
+
+  async getAllDevices(userId: number) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) throw new NotFoundException("Foydalanuvchi topilmadi");
+
+    if (user.role === "ADMIN") {
+      const devices = await this.prisma.device.findMany({
+        include: {
+          user: {
+            select: {
+              id: true,
+              username: true,
+              email: true,
+            },
+          },
+        },
+        orderBy: { id: "asc" },
+      });
+
+      return {
+        message: "Barcha devicelar ro‘yxati",
+        count: devices.length,
+        devices,
+      };
+    }
+
+    const userDevices = await this.prisma.device.findMany({
+      where: { userId },
+      orderBy: { id: "asc" },
+    });
+
+    return {
+      message: "Sizga tegishli devicelar ro‘yxati",
+      count: userDevices.length,
+      devices: userDevices,
+    };
   }
 }
