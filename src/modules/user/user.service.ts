@@ -2,9 +2,11 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from "@nestjs/common";
 import { PrismaService } from "src/core/database/prisma.service";
 import { UpdateUserDto } from "./dto/update.user.dto";
+import { UpdateRoleDto } from "./dto/update.role.dto";
 
 @Injectable()
 export class UserService {
@@ -63,5 +65,27 @@ export class UserService {
     });
 
     return updatedUser;
+  }
+
+  async updateRole(userId: number, data: UpdateRoleDto) {
+    const findAdmin = await this.prisma.user.findFirst({
+      where: { id: userId },
+    });
+    if (!findAdmin) throw new NotFoundException("Admin not found");
+    if (findAdmin.role !== "ADMIN")
+      throw new UnauthorizedException("Faqat admin role o'zgartirishi mumkin");
+
+    if (data.userId === userId && data.role === "USER")
+      throw new UnauthorizedException("Ushbu adminni o'zgartirish mumkin emas");
+
+    const { password, ...updatedUser } = await this.prisma.user.update({
+      where: { id: data.userId },
+      data: { role: data.role },
+    });
+
+    return {
+      message: "User roli muvaffaqiyatli o'zgartirildi",
+      user: updatedUser,
+    };
   }
 }

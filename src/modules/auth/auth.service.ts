@@ -96,7 +96,12 @@ export class AuthService {
 
     return {
       token,
-      user: { id: user.id, email: user.email, username: user.username },
+      user: {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        role: user.role,
+      },
     };
   }
 
@@ -122,7 +127,12 @@ export class AuthService {
 
     return {
       token,
-      user: { id: user.id, email: user.email, username: user.username },
+      user: {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        role: user.role,
+      },
     };
   }
 
