@@ -19,14 +19,14 @@ export class SeederService implements OnModuleInit {
   }
 
   async seedAdmin() {
-    this.logger.log("Admin seeder started");
     const email = this.configService.get("SP_EMAIL");
     const password = this.configService.get("SP_PASSWORD");
     const username = this.configService.get("SP_USERNAME");
-
+    
     const findAdmin = await this.prisma.user.findFirst({ where: { email } });
-
+    
     if (!findAdmin) {
+      this.logger.log("Admin seeder started");
       const hashedPassword = await bcrypt.hash(password, 12);
       await this.prisma.user.create({
         data: { email, password: hashedPassword, username, role: "ADMIN" },
