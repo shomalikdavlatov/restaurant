@@ -58,7 +58,7 @@ export class TrafficController {
   @ApiBearerAuth("token")
   async deleteDevice(@Body() body: DeleteDeviceDto, @Req() request: Request) {
     const userid = request["userId"];
-    return await this.trafficService.updateDevice(userid, body);
+    return await this.trafficService.deleteDevice(userid, body);
   }
 
   @Get("my-all-devices")
