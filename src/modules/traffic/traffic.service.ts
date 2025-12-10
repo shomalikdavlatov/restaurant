@@ -175,7 +175,7 @@ export class TrafficService {
     });
 
     return {
-      message: "Device muvaffaqiyatli o‘chirildi",
+      message: "Device muvaffaqiyatli o‘chirildi!",
       deletedDeviceId: deviceId,
     };
   }
