@@ -102,19 +102,20 @@ export class TrafficService {
     return { message: "success", newDevice };
   }
 
-  async updateDevice(userId: number, data: UpdateDeviceDto) {
-    const { deviceId } = data;
+  async updateDevice(adminId: number, data: UpdateDeviceDto) {
+    const { oldUserId, deviceId, newUserId } = data;
 
-    const admin = await this.prisma.user.findUnique({ where: { id: userId } });
+    const admin = await this.prisma.user.findUnique({ where: { id: adminId } });
     if (!admin) throw new NotFoundException("Admin topilmadi");
     if (admin.role !== "ADMIN")
       throw new ForbiddenException("Faqat admin device yangilashi mumkin");
 
+    // Mavjud device ni ESKI userId va deviceId bilan topamiz
     const existingDevice = await this.prisma.device.findUnique({
       where: {
         userId_deviceId: {
-          userId: data.userId,
-          deviceId,
+          userId: oldUserId,
+          deviceId: deviceId,
         },
       },
     });
@@ -122,31 +123,40 @@ export class TrafficService {
     if (!existingDevice)
       throw new NotFoundException("Yangilanish uchun device topilmadi");
 
-    if (data.userId && data.userId !== existingDevice.userId) {
+    // Agar yangi userId berilgan bo‘lsa va u eski bilan farq qilsa — conflict check
+    if (newUserId && newUserId !== oldUserId) {
       const conflict = await this.prisma.device.findUnique({
         where: {
           userId_deviceId: {
-            userId: data.userId,
-            deviceId,
+            userId: newUserId,
+            deviceId: deviceId,
           },
         },
       });
+
       if (conflict)
         throw new ConflictException(
           "Bu device allaqachon boshqa filialga biriktirilgan"
         );
     }
 
-    const updatedDevice = await this.prisma.device.update({
-      where: { id: existingDevice.id },
-      data: {
-        ...(data.userId && { userId: data.userId }), // agar userId kelgan bo‘lsa yangilanadi
-      },
-    });
+    // Faqat yangi userId berilgan bo‘lsa yangilaymiz
+    if (newUserId && newUserId !== oldUserId) {
+      const updatedDevice = await this.prisma.device.update({
+        where: { id: existingDevice.id },
+        data: { userId: newUserId },
+      });
 
+      return {
+        message: "Device muvaffaqiyatli yangilandi (filial o‘zgartirildi)",
+        updatedDevice,
+      };
+    }
+
+    // Agar newUserId yo‘q yoki eski bilan bir xil bo‘lsa — hech nima o‘zgartirmaymiz
     return {
-      message: "Device muvaffaqiyatli yangilandi",
-      updatedDevice,
+      message: "Device allaqachon shu filialga biriktirilgan (o‘zgarish yo‘q)",
+      device: existingDevice,
     };
   }
 
