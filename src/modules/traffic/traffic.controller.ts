@@ -37,7 +37,7 @@ export class TrafficController {
       throw new BadRequestException("User ID not found in request");
     }
 
-    return this.trafficService.createOrUpdateTraffic(userId, createTrafficDto);
+    return this.trafficService.createOrUpdateTraffic(createTrafficDto);
   }
 
   @Post("create-device")

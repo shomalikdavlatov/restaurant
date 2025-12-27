@@ -15,24 +15,31 @@ import { DeleteDeviceDto } from "./dto/delete.device.dto";
 export class TrafficService {
   constructor(private prisma: PrismaService) {}
 
-  async createOrUpdateTraffic(userId: number, dto: CreateTrafficDto) {
+  async createOrUpdateTraffic(dto: CreateTrafficDto) {
     const { device_id, in_count, out_count } = dto;
 
-    if (in_count <= 0 && out_count <= 0) {
-      throw new BadRequestException("incount va outcount xato kiritilgan");
-    }
+    // DTO da Min(0) bor, shuning uchun salbiy sonlar oldindan bloklanadi.
+    // Agar ikkalasi ham 0 bo'lsa, yangilash foydasiz — ixtiyoriy ravishda xato chiqarish mumkin,
+    // lekin hozir ruxsat beramiz (agar kerak bo'lsa, quyidagi qatorni oching):
+    // if (in_count === 0 && out_count === 0) {
+    //   throw new BadRequestException("Hech bo'lmaganda bittasi 0 dan katta bo'lishi kerak");
+    // }
 
-    const findDevice = await this.prisma.device.findUnique({
+    // Faqat device_id mavjudligini tekshiramiz va unga tegishli filialni (userId) olamiz
+    const device = await this.prisma.device.findFirst({
       where: {
-        userId_deviceId: {
-          userId,
-          deviceId: device_id,
-        },
+        deviceId: device_id,
+      },
+      select: {
+        userId: true,
       },
     });
 
-    if (!findDevice)
-      throw new NotFoundException("filialda ushbu device topilmadi");
+    if (!device) {
+      throw new NotFoundException("Ushbu device_id bazada topilmadi");
+    }
+
+    const userId = device.userId;
 
     const now = new Date();
     const dateTime = new Date(
