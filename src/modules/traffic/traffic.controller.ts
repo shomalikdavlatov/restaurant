@@ -21,12 +21,10 @@ import { DeleteDeviceDto } from "./dto/delete.device.dto";
 
 @Controller("traffic")
 @ApiTags("Traffic")
-@UseGuards(AuthGuard)
 export class TrafficController {
   constructor(private readonly trafficService: TrafficService) {}
 
   @Post()
-  @ApiBearerAuth("token")
   async createTraffic(
     @Body() createTrafficDto: CreateTrafficDto,
     @Req() request: Request
@@ -42,6 +40,7 @@ export class TrafficController {
 
   @Post("create-device")
   @ApiBearerAuth("token")
+  @UseGuards(AuthGuard)
   async createDevice(@Body() body: CreateDeviceDto, @Req() request: Request) {
     const userId = request["userId"];
     return await this.trafficService.createDevice(userId, body);
@@ -49,6 +48,7 @@ export class TrafficController {
 
   @Put("update-device")
   @ApiBearerAuth("token")
+  @UseGuards(AuthGuard)
   async updateDevice(@Body() body: UpdateDeviceDto, @Req() request: Request) {
     const userId = request["userId"];
     return await this.trafficService.updateDevice(userId, body);
@@ -56,6 +56,7 @@ export class TrafficController {
 
   @Delete("delete-device")
   @ApiBearerAuth("token")
+  @UseGuards(AuthGuard)
   async deleteDevice(@Body() body: DeleteDeviceDto, @Req() request: Request) {
     const userid = request["userId"];
     return await this.trafficService.deleteDevice(userid, body);
@@ -63,6 +64,7 @@ export class TrafficController {
 
   @Get("my-all-devices")
   @ApiBearerAuth("token")
+  @UseGuards(AuthGuard)
   async getMyBranches(@Req() request: Request) {
     const userId = request["userId"];
     return await this.trafficService.getAllDevices(userId);
